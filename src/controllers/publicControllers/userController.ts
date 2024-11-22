@@ -21,7 +21,8 @@ export const login: RequestHandler = async(req, res) =>{
                         { expiresIn: '7d' }
                     );
                     res.json({
-                        token
+                        token,
+                        user: hasUser,
                     });
                     return;
                 }
