@@ -32,6 +32,11 @@ server.all('*', requestIntercepter);
 server.use(publicRoutes);
 server.use('/admin',adminRoutes);
 
+server.use((req: Request, res: Response) => {
+    res.status(404)
+    res.json({error: 'Endpoint not found'})
+})
+
 const runServer = (port: number, server: http.Server) => {
     server.listen(port, ()=>{
         console.log(`Running at PORT ${port}`);
