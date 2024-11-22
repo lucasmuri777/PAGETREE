@@ -3,10 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc",
-    "dev": "nodemon -e ts,json,mustache src/server.ts",
-    "start": "node build/server.js"
+    "dev": "nodemon src/server.ts"
   },
   "author": "",
   "license": "ISC",
