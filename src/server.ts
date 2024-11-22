@@ -17,11 +17,7 @@ const server = express();
 const allowedOrigin = process.env.ALLOWED_ORIGIN;
 
 server.use(
-    cors({
-      origin: allowedOrigin || "*", // Público se não houver domínio no .env
-      methods: ["GET", "POST", "PUT", "DELETE"],
-      credentials: true
-    })
+    cors()
   );
 server.use(express.json());
 server.use(express.static(path.join(__dirname, '../public')));
