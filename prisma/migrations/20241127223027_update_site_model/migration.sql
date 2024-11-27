@@ -16,9 +16,10 @@ CREATE TABLE "User" (
 CREATE TABLE "Site" (
     "id" SERIAL NOT NULL,
     "userId" INTEGER NOT NULL,
-    "name" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
     "description" TEXT NOT NULL,
-    "logo" TEXT,
+    "keywords" TEXT NOT NULL,
+    "favicon" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -56,7 +57,7 @@ CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 CREATE UNIQUE INDEX "User_stripeId_key" ON "User"("stripeId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Site_name_key" ON "Site"("name");
+CREATE UNIQUE INDEX "Site_title_key" ON "Site"("title");
 
 -- AddForeignKey
 ALTER TABLE "Site" ADD CONSTRAINT "Site_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;

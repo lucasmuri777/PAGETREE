@@ -8,22 +8,24 @@ export const createSite: RequestHandler = async(req, res) =>{
     const id = req.params.id;
     if(id){
         const siteSchema = z.object({
-            name: z.string(),
+            title: z.string(),
+            keywords: z.string(),
             description: z.string(),
-            logo: z.string(),
+            favicon: z.string(),
         })
         const body = siteSchema.safeParse(req.body);
         if(!body.success){
             res.json({error: 'Dados inválidos'});
             return;
         }
-        const formattedName = body.data.name.replace(/\s+/g, "-");
+        const formattedName = body.data.title.replace(/\s+/g, "-");
     
         const newSite = await sites.create({
             userId: parseInt(id),
-            name: formattedName,
+            title: formattedName as string,
             description: body.data.description,
-            logo: body.data.logo,
+            keywords: body.data.keywords,
+            favicon: body.data.favicon,
         });
         if(newSite) {
             res.status(201).json({newSite});
@@ -39,24 +41,24 @@ export const editSite: RequestHandler = async(req, res) =>{
     const id_user = req.params.id_user;
     if(id && id_user){
         const editSiteSchema = z.object({
-            name: z.string().optional(),
+            title: z.string().optional(),
             description: z.string().optional(),
-            logo: z.string().optional(),
+            favicon: z.string().optional(),
         });
         const body = editSiteSchema.safeParse(req.body);
         if(!body.success){
             res.json({error: 'Dados inválidos'});
             return;
         }
-        const formattedName = body.data.name?.replace(/\s+/g, "-");
+        const formattedName = body.data.title?.replace(/\s+/g, "-");
         let filter = {
             id: parseInt(id),
             userId: parseInt(id_user),
         }
         let data = {
-            name: formattedName,
+            title: formattedName,
             description: body.data.description,
-            logo: body.data.logo
+            favicon: body.data.favicon
         }
         const updatedSite = await sites.update(filter, data);
             
