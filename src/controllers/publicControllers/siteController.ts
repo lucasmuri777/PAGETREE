@@ -11,17 +11,20 @@ export const getSite: RequestHandler = async(req, res) => {
        }else{
             site = await sites.getAll({name: id});
        }
-       if(site){
-        let siteId = site.id;
-        let allSectionOfTheSite = await sections.getAll({siteId: siteId});
-        if(allSectionOfTheSite){
-            site = {
-                head: site,
-                body: allSectionOfTheSite
+       if(site[0]){
+        const siteId: number = site[0].id;
+        if(siteId){
+            const allSectionOfTheSite = await sections.getAll({siteId: siteId});
+            if(allSectionOfTheSite){
+                site = {
+                    head: site,
+                    body: allSectionOfTheSite
+                }
+                res.json({site});
+                return;
             }
-            res.json({site});
-            return;
         }
+       
        }
     }
     res.json({error: 'Site não encontrado'});
