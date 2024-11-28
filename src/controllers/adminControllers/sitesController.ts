@@ -1,7 +1,8 @@
 import { RequestHandler, Response, Request } from "express";
 import * as sites from '../../services/sites';
 import { z } from "zod";
-
+import * as section from '../../services/sections';
+import {DefaultSite} from '../../types/Sections';
 
 
 export const createSite: RequestHandler = async(req, res) =>{
@@ -28,8 +29,13 @@ export const createSite: RequestHandler = async(req, res) =>{
             favicon: body.data.favicon,
         });
         if(newSite) {
-            res.status(201).json({newSite});
-            return;
+            //CRIAR SESSÕES BASICAS
+            let newSectionsBase = await createSectionBases(newSite.id)
+            if(newSectionsBase){
+                res.status(201).json({newSite});
+                return;
+            }
+            
         }    
     }
     
@@ -98,4 +104,31 @@ export const deleteSite: RequestHandler = async(req, res) =>{
 
     res.json({error: 'algo deu errado'});
     return;
+}
+
+const createSectionBases = async(siteId: number) =>{
+    if(siteId){
+        let total = 4;
+        let criados = 0;
+        for(let i = 0; i <= total; i++){
+            let dataAtual = DefaultSite[i];
+            if(dataAtual && dataAtual.type){
+                let newSection = await section.create({
+                    siteId,
+                    type: dataAtual.type,
+                    order: i,
+                    content: dataAtual
+                });
+                if(!newSection){
+                    return false;
+                }
+                criados++;
+            }
+        }
+        console.log('CRIADOS: ' + criados)
+        if(criados - 1 === total){
+            return true;
+        }
+    }
+    return false
 }
