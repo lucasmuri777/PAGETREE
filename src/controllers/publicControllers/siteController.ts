@@ -9,7 +9,7 @@ export const getSite: RequestHandler = async(req, res) => {
        if(parseInt(id)){
             site = await sites.getAll({id: parseInt(id)});
        }else{
-            site = await sites.getAll({name: id});
+            site = await sites.getAll({title: id});
        }
        if(site[0]){
         const siteId: number = site[0].id;

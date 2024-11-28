@@ -29,7 +29,7 @@ export const update = async(filter: updateFilter, data: SiteUpdateData) =>{
 type Filters = {
     id?: number;
     userId?: number;
-    name?: string;
+    title?: string;
 }
 
 export const getAll = async(filters: Filters) =>{

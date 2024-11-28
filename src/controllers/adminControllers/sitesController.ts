@@ -19,7 +19,7 @@ export const createSite: RequestHandler = async(req, res) =>{
             res.json({error: 'Dados inválidos'});
             return;
         }
-        const formattedName = body.data.title.replace(/\s+/g, "-");
+        const formattedName = body.data.title.replace(/\s+/g, "-").toLowerCase();
     
         const newSite = await sites.create({
             userId: parseInt(id),
@@ -56,7 +56,7 @@ export const editSite: RequestHandler = async(req, res) =>{
             res.json({error: 'Dados inválidos'});
             return;
         }
-        const formattedName = body.data.title?.replace(/\s+/g, "-");
+        const formattedName = body.data.title?.replace(/\s+/g, "-").toLowerCase();
         let filter = {
             id: parseInt(id),
             userId: parseInt(id_user),
@@ -125,7 +125,6 @@ const createSectionBases = async(siteId: number) =>{
                 criados++;
             }
         }
-        console.log('CRIADOS: ' + criados)
         if(criados - 1 === total){
             return true;
         }
