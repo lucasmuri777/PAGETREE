@@ -22,7 +22,10 @@
 3 - (GET) `/admin/id_user/site`.
     Essa req retorna todos os sites do id do usuario
 
-4 - (DELETE) `/admin/id_user/site/id_site`.
+4 - (GET) `/admin/id_user/site/id_site`.
+    Essa req retorna o site com base no id_site e no id_user
+
+5 - (DELETE) `/admin/id_user/site/id_site`.
     Essa req deleta o site pelo id
 
 * ### SECTIONS

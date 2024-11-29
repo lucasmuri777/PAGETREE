@@ -92,6 +92,17 @@ export const getSitesByUserId:RequestHandler = async(req, res) =>{
     return;
 }
 
+export const getSiteByUserIdAndSiteId: RequestHandler = async(req, res) =>{
+    const {id_user, id} = req.params;
+    if(id && id_user){
+        const siteByUserIdAndSiteId = await sites.getAll({userId: parseInt(id_user), id: parseInt(id)});
+        if(siteByUserIdAndSiteId){
+            res.json({siteByUserIdAndSiteId});
+            return;
+        }
+    }
+}
+
 export const deleteSite: RequestHandler = async(req, res) =>{
     const {id_user, id} = req.params;
     if(id && id_user){

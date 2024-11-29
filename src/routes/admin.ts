@@ -13,6 +13,7 @@ const router = Router();
 router.post('/:id/site', auth, sitesController.createSite);
 router.put('/:id_user/site/:id', auth, sitesController.editSite);
 router.get('/:id_user/site', auth, sitesController.getSitesByUserId);
+router.get('/:id_user/site/:id', auth, sitesController.getSiteByUserIdAndSiteId);
 router.delete('/:id_user/site/:id', auth, sitesController.deleteSite);
 
 //ROTAS DAS SESSOES DO SITE
