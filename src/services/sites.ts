@@ -7,7 +7,7 @@ export const create = async(data: SiteCreateData) =>{
     try{    
         return await prisma.site.create({data});
     }catch(err){
-        console.log(err);
+        console.log(err + 'errorrrr');
         return false;
     }
 }

@@ -29,9 +29,9 @@ export const createSection: RequestHandler = async(req, res) =>{
 export const updateSection: RequestHandler = async(req, res) =>{
     const {id_user, id_site, id} = req.params;
     if(id_user && id && id_site){
-        let { order, ...dados } = req.body;
+        let content = req.body.content;
         let data = {
-            content: dados
+            content: content
         }     
         let filter = { id: parseInt(id), siteId: parseInt(id_site) };
         let update = await sections.update(filter, data as sections.sectionCreateData);
