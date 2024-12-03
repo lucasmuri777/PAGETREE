@@ -29,3 +29,17 @@ export const auth: RequestHandler = async(req, res, next) =>{
         res.status(403).json({error: 'Unauthorized'});
     }
 }
+
+export const decodedJWT = async(token: string) =>{
+    const tokenVal = token.split(' ')[1];
+    try{
+        const decoded = await JWT.verify(
+            tokenVal,
+            process.env.SECRET_API_BACK_JWT as string,
+        ) as User;
+        return decoded ? decoded : false;
+    }catch(err){
+        console.log(err);
+        return false;
+    }
+}

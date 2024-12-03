@@ -5,8 +5,10 @@ export const DefaultSite = [
         backgroundColor: 'white',
         nav: {
             links: [
-                {label: 'Home', href: '#'}, 
-                {label: 'Quem somos', href: '#'}],
+                {label: 'Home', href: '#Banner-Free'}, 
+                {label: 'Quem somos', href: '#Quem-Somos-Free'},
+                {label: 'Serviços', href: '#Servicos-Free'},
+                {label: 'Contato', href: '#Footer-Free'},],
             color: 'black'
         }
     },
@@ -54,6 +56,15 @@ export const DefaultSite = [
                 img: 'https://placehold.co/400',
                 alt: 'Serviço 2',
                 title: 'Serviço 2',
+                description: 'Lorem ipsum dolor sit amet, consectetur',
+                backgroundColor: 'white',
+                descriptionColor: 'black',
+                titleColor: '#226ACF',
+            },
+            { 
+                img: 'https://placehold.co/400',
+                alt: 'Serviço 3',
+                title: 'Serviço 3',
                 description: 'Lorem ipsum dolor sit amet, consectetur',
                 backgroundColor: 'white',
                 descriptionColor: 'black',

@@ -1,9 +1,17 @@
 import { RequestHandler, Response, Request } from "express";
 import * as sites from '../../services/sites';
+import * as user from '../../services/user';
+import {decodedJWT} from '../../services/auth'
 import { z } from "zod";
 import * as section from '../../services/sections';
 import {DefaultSite} from '../../types/Sections';
 
+type userJwt = {
+    id: number;
+    email: string;
+    name: string;
+    premium: boolean;
+} | false;
 
 export const createSite: RequestHandler = async(req, res) =>{
     const id = req.params.id;
@@ -13,6 +21,7 @@ export const createSite: RequestHandler = async(req, res) =>{
             keywords: z.string(),
             description: z.string(),
             favicon: z.string(),
+            type: z.string(),
         })
         const body = siteSchema.safeParse(req.body);
         if(!body.success){
@@ -20,23 +29,36 @@ export const createSite: RequestHandler = async(req, res) =>{
             return;
         }
         const formattedName = body.data.title.replace(/\s+/g, "-").toLowerCase();
-    
-        const newSite = await sites.create({
-            userId: parseInt(id),
-            title: formattedName as string,
-            description: body.data.description,
-            keywords: body.data.keywords,
-            favicon: body.data.favicon,
-        });
-        if(newSite) {
-            //CRIAR SESSÕES BASICAS
-            let newSectionsBase = await createSectionBases(newSite.id)
-            if(newSectionsBase){
-                res.status(201).json({newSite});
-                return;
-            }
+        if(req.headers.authorization){
+            const userPremium: userJwt = await decodedJWT(req.headers.authorization) as userJwt;
             
-        }    
+            if(userPremium && userPremium.id === parseInt(id)){
+                if(body.data.type != 'FREE' && !userPremium.premium){
+                    res.json({error: 'Você não possui permissão para esse tipo de site'});
+                    return;
+                }
+                const newSite = await sites.create({
+                    userId: parseInt(id),
+                    title: formattedName as string,
+                    description: body.data.description,
+                    keywords: body.data.keywords,
+                    favicon: body.data.favicon,
+                    type: body.data.type,
+                });
+                if(newSite) {
+                    //CRIAR SESSÕES BASICAS
+                    let newSectionsBase = await createSectionBases(newSite.id)
+                    if(newSectionsBase){
+                        res.status(201).json({newSite});
+                        return;
+                    }
+                    
+                }  
+
+            }
+
+        }
+        
     }
     
     res.json({error: 'Algo deu errado'});
