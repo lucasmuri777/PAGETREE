@@ -30,6 +30,14 @@ export const updateSection: RequestHandler = async(req, res) =>{
     const {id_user, id_site, id} = req.params;
     if(id_user && id && id_site){
         let content = req.body.content;
+        if (typeof content === "string") {
+            try {
+                content = JSON.parse(content);
+            } catch (err) {
+                res.status(400).json({ error: "Content não está em formato JSON válido" });
+                return;
+            }
+        }
         let data = {
             content: content
         }     
