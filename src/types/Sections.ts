@@ -21,6 +21,7 @@ export const DefaultSite = [
         descriptionColor: 'black',
         buttonBackgroundColor: '#226ACF',
         buttonTextColor: 'white',
+        buttonLink: '#',
         slide: [
             {image: 'https://placehold.co/600x400', alt: 'slide 1'},
             {image: 'https://placehold.co/400', alt: 'slide 2'}
@@ -37,6 +38,7 @@ export const DefaultSite = [
         buttonBackgroundColor: '#226ACF',
         buttonTextColor: 'white',
         backgroundColor: 'white',
+        buttonLink: '#',
     },
     {
         type: 'SERVICOS',
@@ -130,6 +132,7 @@ type Banner = {
     descriptionColor: string;
     buttonBackgroundColor: string;
     buttonTextColor: string;
+    buttonLink: string;
     slide: Slide[];
 }
 type Slide = {
@@ -147,6 +150,7 @@ type QuemSomos = {
     descriptionColor: string;
     buttonBackgroundColor: string;
     buttonTextColor: string;
+    buttonLink: string;
     backgroundColor: string;
 }
 
