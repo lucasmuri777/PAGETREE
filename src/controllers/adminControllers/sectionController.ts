@@ -30,6 +30,7 @@ export const updateSection: RequestHandler = async(req, res) =>{
     const {id_user, id_site, id} = req.params;
     if(id_user && id && id_site){
         let content = req.body.content;
+        let order = req.body.order;
         if (typeof content === "string") {
             try {
                 content = JSON.parse(content);
@@ -39,6 +40,7 @@ export const updateSection: RequestHandler = async(req, res) =>{
             }
         }
         let data = {
+            order: parseInt(order),
             content: content
         }     
         let filter = { id: parseInt(id), siteId: parseInt(id_site) };
