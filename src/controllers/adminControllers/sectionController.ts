@@ -1,6 +1,6 @@
 import { RequestHandler, Response, Request } from "express";
 import * as sections from '../../services/sections';
-import { z } from "zod";
+import { object, z } from "zod";
 
 
 export const createSection: RequestHandler = async(req, res) =>{
@@ -39,10 +39,16 @@ export const updateSection: RequestHandler = async(req, res) =>{
                 return;
             }
         }
-        let data = {
-            order: parseInt(order),
+        let data: object = {
             content: content
-        }     
+        }
+        if(order){
+           data = {
+                order: parseInt(order),
+                content: content
+            }   
+        }
+   
         let filter = { id: parseInt(id), siteId: parseInt(id_site) };
         let update = await sections.update(filter, data as sections.sectionCreateData);
         if(update){
