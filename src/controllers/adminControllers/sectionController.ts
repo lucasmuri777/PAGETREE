@@ -42,7 +42,7 @@ export const updateSection: RequestHandler = async(req, res) =>{
         let data: object = {
             content: content
         }
-        if(order !== undefined && order !== null){
+        if(order || order == 0){
            data = {
                 order: parseInt(order),
                 content: content
