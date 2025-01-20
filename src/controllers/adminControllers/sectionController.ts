@@ -100,23 +100,22 @@ export const deleteSection: RequestHandler = async(req, res) =>{
     if(id_user && id_site && id){
         const allSections = await sections.getAll({siteId: parseInt(id_site)}) as deleteSectionType[];;
         const filter = allSections.filter((section)=>{
-            if(section.id === parseInt(id)){
-                return false;
-            }
-            return true;
+            return section.id === parseInt(id) ? false : true;
         })
+    
         if(filter.length > 1){
             filter.map(async(section, index)=>{
                 let filter = { id: section.id, siteId: section.siteId };
                 await sections.update(filter, {order: index} as sections.sectionCreateData);
             })
         }
-        
+
         const deletedSection = await sections.remove({id: parseInt(id), siteId: parseInt(id_site)});
         if(deletedSection){
             res.status(200).json({deletedSection});
             return;
         }
+
     }
     res.json({error: 'Algo deu errado'});
     return;
