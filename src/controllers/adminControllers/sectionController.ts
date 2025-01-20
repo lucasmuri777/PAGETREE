@@ -2,6 +2,11 @@ import { RequestHandler, Response, Request } from "express";
 import * as sections from '../../services/sections';
 import { object, z } from "zod";
 
+type deleteSectionType = {
+    id: number;
+    siteId: number;
+
+}
 
 export const createSection: RequestHandler = async(req, res) =>{
     const {id_user,id} = req.params;
@@ -93,6 +98,20 @@ export const getSectionById: RequestHandler = async(req, res) =>{
 export const deleteSection: RequestHandler = async(req, res) =>{
     const {id_user, id_site, id} = req.params;
     if(id_user && id_site && id){
+        const allSections = await sections.getAll({siteId: parseInt(id_site)}) as deleteSectionType[];;
+        const filter = allSections.filter((section)=>{
+            if(section.id === parseInt(id)){
+                return false;
+            }
+            return true;
+        })
+        if(filter.length > 1){
+            filter.map(async(section, index)=>{
+                let filter = { id: section.id, siteId: section.siteId };
+                await sections.update(filter, {order: index} as sections.sectionCreateData);
+            })
+        }
+        
         const deletedSection = await sections.remove({id: parseInt(id), siteId: parseInt(id_site)});
         if(deletedSection){
             res.status(200).json({deletedSection});
