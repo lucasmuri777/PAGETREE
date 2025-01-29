@@ -25,10 +25,13 @@ export const auth: RequestHandler = async(req, res, next) =>{
     }
     if(sucess){
         next();
+        return;
     }else{
         res.status(403).json({error: 'Unauthorized'});
+        return;
     }
 }
+
 
 export const decodedJWT = async(token: string) =>{
     const tokenVal = token.split(' ')[1];
