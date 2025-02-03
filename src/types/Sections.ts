@@ -10,7 +10,8 @@ export const DefaultSite = [
                 {label: 'Serviços', href: '#Servicos-Free'},
                 {label: 'Contato', href: '#Footer-Free'},],
             color: '#000000'
-        }
+        },
+        idSection: 'Header'
     },
     {
         type: 'BANNER',
@@ -26,6 +27,7 @@ export const DefaultSite = [
             {image: 'https://placehold.co/600x400', alt: 'slide 1'},
             {image: 'https://placehold.co/400', alt: 'slide 2'}
         ],
+        idSection: 'Banner'
     },
     {
         type: 'QUEMSOMOS',
@@ -39,6 +41,7 @@ export const DefaultSite = [
         buttonTextColor: '#ffffff',
         backgroundColor: '#ffffff',
         buttonLink: '#',
+        idSection: 'Quem-Somos'
     },
     {
         type: 'SERVICOS',
@@ -76,6 +79,7 @@ export const DefaultSite = [
         backgroundColor: '#ffffff',
         titleColor: '#226ACF',
         descriptionColor: '#000000',
+        idSection: 'Servicos'
     },
     {
         type: 'FOOTER',
@@ -103,6 +107,7 @@ export const DefaultSite = [
         backgroundColor:'#000000',
         textColor: '#ffffff',
         copyright: 'Todos os direitos reservados 2024',
+        idSection: 'Footer'
     }] 
 
 export type Section = {
