@@ -1,4 +1,5 @@
-export const DefaultSite = [
+
+const Padrao1 = [
     {
         type: 'HEADER',
         logo: 'https://placehold.co/400',
@@ -109,6 +110,14 @@ export const DefaultSite = [
         copyright: 'Todos os direitos reservados 2024',
         idSection: 'Footer'
     }] 
+
+type TemasType = {
+    [key: string]: object,
+}
+export const Temas: TemasType = {
+    Padrao: Padrao1
+}
+
 
 export type Section = {
     siteId: number;

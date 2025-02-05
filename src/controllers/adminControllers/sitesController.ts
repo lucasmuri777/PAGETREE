@@ -4,7 +4,7 @@ import * as user from '../../services/user';
 import {decodedJWT} from '../../services/auth'
 import { z } from "zod";
 import * as section from '../../services/sections';
-import {DefaultSite} from '../../types/Sections';
+import {Temas} from '../../types/Sections';
 
 type userJwt = {
     id: number;
@@ -33,10 +33,10 @@ export const createSite: RequestHandler = async(req, res) =>{
             const userPremium: userJwt = await decodedJWT(req.headers.authorization) as userJwt;
             
             if(userPremium && userPremium.id === parseInt(id)){
-                if(body.data.type != 'FREE' && !userPremium.premium){
+                /*if(!userPremium.premium){
                     res.json({error: 'Você não possui permissão para esse tipo de site'});
                     return;
-                }
+                }*/
                 const newSite = await sites.create({
                     userId: parseInt(id),
                     title: formattedName as string,
@@ -47,7 +47,7 @@ export const createSite: RequestHandler = async(req, res) =>{
                 });
                 if(newSite) {
                     //CRIAR SESSÕES BASICAS
-                    let newSectionsBase = await createSectionBases(newSite.id)
+                    let newSectionsBase = await createSectionBases(newSite.id, body.data.type)
                     if(newSectionsBase){
                         res.status(201).json({newSite});
                         return;
@@ -138,13 +138,16 @@ export const deleteSite: RequestHandler = async(req, res) =>{
     res.json({error: 'algo deu errado'});
     return;
 }
-
-const createSectionBases = async(siteId: number) =>{
+type objectTheme = {
+    [key: string]: any;
+    type: string;
+}
+const createSectionBases = async(siteId: number, type: string) =>{
     if(siteId){
-        let total = 4;
-        let criados = 0;
-        for(let i = 0; i <= total; i++){
-            let dataAtual = DefaultSite[i];
+        const theme: objectTheme[] = Temas[type] as objectTheme[];
+        for(let i = 0; i < theme.length; i++){
+            const dataAtual = theme[i];
+            
             if(dataAtual && dataAtual.type){
                 let newSection = await section.create({
                     siteId,
@@ -155,12 +158,8 @@ const createSectionBases = async(siteId: number) =>{
                 if(!newSection){
                     return false;
                 }
-                criados++;
             }
         }
-        if(criados - 1 === total){
-            return true;
-        }
     }
-    return false
+    return true
 }
