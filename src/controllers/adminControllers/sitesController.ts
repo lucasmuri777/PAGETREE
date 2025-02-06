@@ -1,11 +1,11 @@
 import { RequestHandler, Response, Request } from "express";
 import * as sites from '../../services/sites';
 import * as user from '../../services/user';
-import {decodedJWT} from '../../services/auth'
 import { z } from "zod";
 import * as section from '../../services/sections';
 import {Temas} from '../../types/Sections';
-
+import { decodedJWT } from "../../services/auth";
+import { User } from "../../types/User";
 type userJwt = {
     id: number;
     email: string;
@@ -15,7 +15,8 @@ type userJwt = {
 
 export const createSite: RequestHandler = async(req, res) =>{
     const id = req.params.id;
-    if(id){
+    const token: User = await decodedJWT(req.headers.authorization as string) as User;
+    if(id && token && token.id == parseInt(id)){
         const siteSchema = z.object({
             title: z.string(),
             keywords: z.string(),
@@ -67,7 +68,9 @@ export const createSite: RequestHandler = async(req, res) =>{
 export const editSite: RequestHandler = async(req, res) =>{
     const id = req.params.id;
     const id_user = req.params.id_user;
-    if(id && id_user){
+    const token: User = await decodedJWT(req.headers.authorization as string) as User;
+    
+    if(id && id_user && token && token.id == parseInt(id_user)){
         const editSiteSchema = z.object({
             title: z.string().optional(),
             description: z.string().optional(),
@@ -94,6 +97,9 @@ export const editSite: RequestHandler = async(req, res) =>{
             res.status(200).json({updatedSite});
             return;
         }
+    }else{
+        res.json({error: 'Você não tem permissão para editar esse site'});
+        return;
     }
     
     res.json({error: 'algo deu errado'});
@@ -102,12 +108,16 @@ export const editSite: RequestHandler = async(req, res) =>{
 
 export const getSitesByUserId:RequestHandler = async(req, res) =>{
     const id_user = req.params.id_user;
-    if(id_user){
+    const token: User = await decodedJWT(req.headers.authorization as string) as User;
+    if(id_user && token && token.id == parseInt(id_user as string)){
         const sitesByUserId = await sites.getAll({userId: parseInt(id_user)});
         if(sitesByUserId){
             res.json({sitesByUserId});
             return;
         }
+    }else{
+        res.json({error: 'Você não tem permissão para acessar essas informações'});
+        return;
     }
 
     res.json({error: 'algo deu errado'});
@@ -116,7 +126,8 @@ export const getSitesByUserId:RequestHandler = async(req, res) =>{
 
 export const getSiteByUserIdAndSiteId: RequestHandler = async(req, res) =>{
     const {id_user, id} = req.params;
-    if(id && id_user){
+    const token: User = await decodedJWT(req.headers.authorization as string) as User;
+    if(id && id_user && token && token.id == parseInt(id_user)){
         const siteByUserIdAndSiteId = await sites.getAll({userId: parseInt(id_user), id: parseInt(id)});
         if(siteByUserIdAndSiteId){
             res.json({siteByUserIdAndSiteId});
@@ -127,7 +138,8 @@ export const getSiteByUserIdAndSiteId: RequestHandler = async(req, res) =>{
 
 export const deleteSite: RequestHandler = async(req, res) =>{
     const {id_user, id} = req.params;
-    if(id && id_user){
+    const token: User = await decodedJWT(req.headers.authorization as string) as User;
+    if(id && id_user && token && token.id == parseInt(id_user)){
         const deletedSite = await sites.remove({id: parseInt(id), userId: parseInt(id_user)});
         if(deletedSite){
             res.status(200).json({deletedSite});

@@ -1,6 +1,8 @@
 import { RequestHandler, Response, Request } from "express";
 import * as sections from '../../services/sections';
 import { object, z } from "zod";
+import { decodedJWT } from "../../services/auth";
+import { User } from "../../types/User";
 
 type deleteSectionType = {
     id: number;
@@ -11,8 +13,9 @@ type deleteSectionType = {
 export const createSection: RequestHandler = async(req, res) =>{
     const {id_user,id} = req.params;
     const type = req.body.type as string;
+    const token: User = await decodedJWT(req.headers.authorization as string) as User;
     
-    if(id_user && id){
+    if(id_user && id && token && token.id == parseInt(id_user)){
         let { order, ...dados } = req.body;
         let data = {
             siteId: parseInt(id),
@@ -33,7 +36,8 @@ export const createSection: RequestHandler = async(req, res) =>{
 
 export const updateSection: RequestHandler = async(req, res) =>{
     const {id_user, id_site, id} = req.params;
-    if(id_user && id && id_site){
+    const token: User = await decodedJWT(req.headers.authorization as string) as User;
+    if(id_user && id && id_site && token && token.id == parseInt(id_user)){
         let content = req.body.content;
         let order = req.body.order;
         if (typeof content === "string") {
@@ -68,7 +72,8 @@ export const updateSection: RequestHandler = async(req, res) =>{
 
 export const getSectionsBySiteId: RequestHandler = async(req, res) =>{
     const {id_user, id_site} = req.params;
-    if(id_user && id_site){
+    const token: User = await decodedJWT(req.headers.authorization as string) as User;
+    if(id_user && id_site && token && token.id == parseInt(id_user)){
         const allSections = await sections.getAll({siteId: parseInt(id_site)});
         if(allSections){
             res.json({allSections});
@@ -97,7 +102,8 @@ export const getSectionById: RequestHandler = async(req, res) =>{
 
 export const deleteSection: RequestHandler = async(req, res) =>{
     const {id_user, id_site, id} = req.params;
-    if(id_user && id_site && id){
+    const token: User = await decodedJWT(req.headers.authorization as string) as User;
+    if(id_user && id_site && id && token && token.id == parseInt(id_user)){
         const allSections = await sections.getAll({siteId: parseInt(id_site)}) as deleteSectionType[];;
         const filter = allSections.filter((section)=>{
             return section.id === parseInt(id) ? false : true;
