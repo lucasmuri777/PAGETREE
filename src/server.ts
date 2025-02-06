@@ -9,6 +9,8 @@ import fs from 'fs';
 import publicRoutes from './routes/public';
 import adminRoutes from './routes/admin';
 import { requestIntercepter } from './utils/requestIntercepter';
+import * as stripeController  from './controllers/adminControllers/stripeController';
+
 
 dotenv.config();
 
@@ -18,12 +20,14 @@ const allowedOrigin = process.env.ALLOWED_ORIGIN;
 
 server.use(
     cors()
-  );
-server.use(express.json());
-server.use(express.static(path.join(__dirname, '../public')));
-server.use(express.urlencoded({extended:true}));
+);
+  server.use(express.static(path.join(__dirname, '../public')));
 
 server.all('*', requestIntercepter);
+// Rota do webhook - deve vir antes dos middlewares globais
+server.post("/webhook", express.raw({ type: "application/json" }),stripeController.handleWebhook);
+server.use(express.json());
+server.use(express.urlencoded({extended:true}));
 
 server.use(publicRoutes);
 server.use('/admin',adminRoutes);

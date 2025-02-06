@@ -1,11 +1,13 @@
 import { Router } from 'express';
 import { auth } from '../services/auth';
 import { upload } from "../middleware/multer";
+import express from 'express';
 
 
 import * as sitesController from '../controllers/adminControllers/sitesController';
 import * as sectionController from '../controllers/adminControllers/sectionController';
 import * as imageController from '../controllers/adminControllers/imagesController';
+import * as stripeController  from '../controllers/adminControllers/stripeController';
 
 const router = Router();
 
@@ -28,4 +30,9 @@ router.delete('/:id_user/site/:id_site/section/:id', auth, sectionController.del
 router.post('/:id_user/image', auth, upload.single('image'),imageController.createImage);
 router.get('/:id_user/image', auth,imageController.getImagesByIdUser);
 router.delete('/:id_user/image/:id', auth,imageController.deleteImage);
+
+//rota de pagamentos stripe
+router.post('/create-checkout-session', auth, stripeController.createChekout);
+router.put('/change-user', auth, stripeController.updateUser);
+
 export default router;

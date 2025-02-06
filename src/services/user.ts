@@ -34,3 +34,16 @@ export const getOne = async(filters: GetOneFilters) =>{
         return false;
     }
 }
+type updateFilter ={
+    stripeId: string;
+}
+type UserUpdateData = Prisma.Args<typeof prisma.user, 'update'>['data'];
+
+export const updatePremium = async(filter: updateFilter,data: UserUpdateData) =>{
+    try{    
+        return prisma.user.update({where: filter, data});
+    }catch(err){
+        console.log(err);
+        return false;
+    }
+}
