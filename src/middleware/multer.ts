@@ -12,5 +12,5 @@ export const upload = multer({
       cb(new Error("Formato de arquivo inválido. Apenas PNG, JPG e JPEG são permitidos."));
     }
   },
-  limits: { fileSize: 400 * 1024 * 1024 }, 
+  limits: { fileSize: 30 * 1024 * 1024 }, 
 });
