@@ -1,11 +1,13 @@
+-- CreateEnum
+CREATE TYPE "SubscriptionType" AS ENUM ('BASIC', 'PREMIUM', 'FREE');
+
 -- CreateTable
 CREATE TABLE "User" (
     "id" SERIAL NOT NULL,
     "email" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "stripeId" TEXT NOT NULL,
-    "stripeSubscriptionId" TEXT,
-    "subscriptionStatus" TEXT,
+    "plan" "SubscriptionType" NOT NULL DEFAULT 'FREE',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -20,6 +22,7 @@ CREATE TABLE "Site" (
     "description" TEXT NOT NULL,
     "keywords" TEXT NOT NULL,
     "favicon" TEXT,
+    "type" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 

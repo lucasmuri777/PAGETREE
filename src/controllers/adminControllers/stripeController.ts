@@ -4,6 +4,7 @@ import { RequestHandler } from "express";
 import { decodedJWT } from "../../services/auth";
 import { UserStripe } from "../../types/User";
 import * as User from '../../services/user';
+import { SubscriptionType } from '@prisma/client';
 dotenv.config();
 
 const stripe = new Stripe(process.env.SECRET_KEY_STRIPE as string, {
@@ -12,16 +13,16 @@ const stripe = new Stripe(process.env.SECRET_KEY_STRIPE as string, {
 // Initialize your Stripe client
 
 export const createChekout:RequestHandler = async(req, res) =>{
-    const {priceId, mode} = req.body;
+    const {priceId} = req.body;
     const authorization = req.headers.authorization;
     const user: UserStripe = await decodedJWT(authorization as string) as UserStripe;
     
-    if(user && mode == 'subscription' || user && mode == 'payment'){
+    if(user){
         
         try{
             const session = await stripe.checkout.sessions.create({
                 payment_method_types: ['card'],
-                mode: mode,
+                mode: 'subscription',
                 customer: user.stripeId, 
                 line_items: [{ price: priceId, quantity: 1 }],
                 success_url: "https://seusite.com/sucesso",
@@ -54,7 +55,7 @@ export const handleWebhook: RequestHandler = async(req,res) =>{
                     const failedInvoice = event.data.object;
                     
                     if (failedInvoice.customer) {
-                        await User.updatePremium({ stripeId: failedInvoice.customer as string }, { premium: false });
+                        await User.updatePremium({ stripeId: failedInvoice.customer as string }, { plan: SubscriptionType.FREE });
                         console.log(`Pagamento falhou para o usuário ${ failedInvoice.customer}, acesso premium revogado`);
                     }
                     
@@ -62,17 +63,26 @@ export const handleWebhook: RequestHandler = async(req,res) =>{
 
                 case 'invoice.payment_succeeded':
                     const succeededInvoice = event.data.object;
+                    const succeededPriceId = succeededInvoice.lines?.data[0]?.price?.id ?? null; // Evita erro de null
+
+                    let planType: SubscriptionType = SubscriptionType.FREE;
+
+                    if (succeededPriceId === process.env.STRIPE_PRICE_ID_PREMIUM) {
+                        planType = SubscriptionType.PREMIUM;
+                    } else if (succeededPriceId === process.env.STRIPE_PRICE_ID_BASIC) {
+                        planType = SubscriptionType.BASIC;
+    }
                     if (succeededInvoice.customer) {
-                        await User.updatePremium({ stripeId: succeededInvoice.customer as string }, { premium: true });
+                        await User.updatePremium({ stripeId: succeededInvoice.customer as string }, { plan: planType });
                         console.log(`Pagamento bem-sucedido para o usuário de id ${ succeededInvoice.customer}, acesso premium concedido`);
                     }
                     break;
 
                 case 'customer.subscription.deleted':
                     const deletedSubscription = event.data.object;
-                    
+
                     if (deletedSubscription.customer) {
-                        await User.updatePremium({ stripeId: deletedSubscription.customer as string }, { premium: false });
+                        await User.updatePremium({ stripeId: deletedSubscription.customer as string }, { plan: SubscriptionType.FREE });
 
                         console.log(`Assinatura cancelada para o usuário ${deletedSubscription.customer as string}, acesso premium revogado`);
                     }
@@ -82,9 +92,9 @@ export const handleWebhook: RequestHandler = async(req,res) =>{
                 case 'customer.subscription.updated':
                     const updatedSubscription = event.data.object;
                     const updatedUserId = updatedSubscription.customer;
-
+                    
                     if (updatedSubscription.status === 'canceled' || updatedSubscription.status === 'unpaid') {
-                        await User.updatePremium({ stripeId: updatedUserId as string }, { premium: false });
+                        await User.updatePremium({ stripeId: updatedUserId as string }, { plan: SubscriptionType.FREE });
                         console.log(`Assinatura atualizada e cancelada para o usuário ${updatedUserId}, acesso premium revogado`);
                     }
                     break;
