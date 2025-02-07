@@ -11,5 +11,11 @@
             "src": "/(.*)",
             "dest": "src/server.ts"
         }
-    ]
+    ],
+    "functions": {
+        "api/*": {
+            "maxDuration": 10,
+            "memory": 1024
+        }
+    }
 }
