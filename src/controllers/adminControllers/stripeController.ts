@@ -13,7 +13,7 @@ const stripe = new Stripe(process.env.SECRET_KEY_STRIPE as string, {
 // Initialize your Stripe client
 
 export const createChekout:RequestHandler = async(req, res) =>{
-    const {priceId} = req.body;
+    const {priceId, success_url, cancel_url} = req.body;
     const authorization = req.headers.authorization;
     const user: UserStripe = await decodedJWT(authorization as string) as UserStripe;
     

@@ -1,6 +1,7 @@
 import { RequestHandler, Response, Request } from "express";
 import * as sites from '../../services/sites';
 import * as user from '../../services/user';
+
 import { z } from "zod";
 import * as section from '../../services/sections';
 import {Temas} from '../../types/Sections';
@@ -31,13 +32,20 @@ export const createSite: RequestHandler = async(req, res) =>{
         }
         const formattedName = body.data.title.replace(/\s+/g, "-").toLowerCase();
         if(req.headers.authorization){
-            const userPremium: userJwt = await decodedJWT(req.headers.authorization) as userJwt;
-            
-            if(userPremium && userPremium.id === parseInt(id)){
-                /*if(!userPremium.premium){
-                    res.json({error: 'Você não possui permissão para esse tipo de site'});
-                    return;
-                }*/
+            const userPremium = await user.getOne({id: token.id, email: token.email});
+            if(userPremium && userPremium.plan == 'BASIC' || userPremium && userPremium.plan == 'PREMIUM'){
+                let sitesTotal = await sites.getAll({userId: token.id});
+                if(sitesTotal){
+                    if(sitesTotal.length >= 1 && userPremium.plan == 'BASIC'){
+                        res.json({error: 'Você atingiu o limite de sites que pode criar no plano BASIC'});
+                        return;
+                    }
+                    if(sitesTotal.length >= 5 && userPremium.plan == 'PREMIUM'){
+                        res.json({error: 'Você atingiu o limite de sites que pode criar no plano PREMIUM'});
+                        return;
+                    }
+                }
+
                 const newSite = await sites.create({
                     userId: parseInt(id),
                     title: formattedName as string,
@@ -47,22 +55,25 @@ export const createSite: RequestHandler = async(req, res) =>{
                     type: body.data.type,
                 });
                 if(newSite) {
-                    //CRIAR SESSÕES BASICAS
+                        //CRIAR SESSÕES BASICAS
                     let newSectionsBase = await createSectionBases(newSite.id, body.data.type)
                     if(newSectionsBase){
                         res.status(201).json({newSite});
                         return;
                     }
-                    
-                }  
-
+                        
+                } 
+                
+            }else{
+                res.json({error: 'Assine algum plano para poder criar sites'});
+                return;
             }
-
+            
         }
         
     }
     
-    res.json({error: 'Algo deu errado'});
+    res.json({error: 'Algo deu errado - (mude o title e tente novamente)'});
     return;
 }
 export const editSite: RequestHandler = async(req, res) =>{
