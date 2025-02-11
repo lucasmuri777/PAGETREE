@@ -8,7 +8,7 @@ import * as sitesController from '../controllers/adminControllers/sitesControlle
 import * as sectionController from '../controllers/adminControllers/sectionController';
 import * as imageController from '../controllers/adminControllers/imagesController';
 import * as stripeController  from '../controllers/adminControllers/stripeController';
-
+import * as userInfosController from '../controllers/adminControllers/userInfosController';
 const router = Router();
 
 //ROTAS DO SITE
@@ -34,5 +34,8 @@ router.delete('/:id_user/image/:id', auth,imageController.deleteImage);
 //rota de pagamentos stripe
 router.post('/create-checkout-session', auth, stripeController.createChekout);
 router.put('/change-user', auth, stripeController.updateUser);
+
+//rota pra pegar userInfos 
+router.get('/:id_user/user-info', auth, userInfosController.getInfoUser);
 
 export default router;

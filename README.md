@@ -55,3 +55,12 @@
 
 3 - (DELETE) `/admin/id_user/image/id_image`.
     Essa req recebe o id_user e id_image e deleta a imagem do firestore e do banco de dados
+
+### STRIPE 
+1 - (POST) `/admin/create-checkout-session`
+    Essa req recebe o token no header, e no body recebe priceId, success_url, cancel_url
+
+### USER INFOS
+
+1 - (GET) `/admin/id_user/user-info`
+    Recebe o token no header, e retorna as infos do user na stripe
