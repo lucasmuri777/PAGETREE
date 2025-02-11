@@ -5,6 +5,7 @@ import { decodedJWT } from "../../services/auth";
 import { UserStripe } from "../../types/User";
 import * as User from '../../services/user';
 import { SubscriptionType } from '@prisma/client';
+import { z } from "zod";
 dotenv.config();
 
 const stripe = new Stripe(process.env.SECRET_KEY_STRIPE as string, {
@@ -13,10 +14,18 @@ const stripe = new Stripe(process.env.SECRET_KEY_STRIPE as string, {
 // Initialize your Stripe client
 
 export const createChekout:RequestHandler = async(req, res) =>{
-    const {priceId, success_url, cancel_url} = req.body;
     const authorization = req.headers.authorization;
     const user: UserStripe = await decodedJWT(authorization as string) as UserStripe;
-    
+    const siteSchema = z.object({
+        priceId: z.string(),
+        success_url: z.string(),
+        cancel_url: z.string(),
+    })
+    const body = siteSchema.safeParse(req.body);
+    if(!body.success){
+        res.json({error: 'Dados inválidos'});
+        return;
+    }
     if(user){
         
         try{
@@ -24,9 +33,9 @@ export const createChekout:RequestHandler = async(req, res) =>{
                 payment_method_types: ['card'],
                 mode: 'subscription',
                 customer: user.stripeId, 
-                line_items: [{ price: priceId, quantity: 1 }],
-                success_url: "https://seusite.com/sucesso",
-                cancel_url: "https://seusite.com/cancelado",
+                line_items: [{ price: body.data.priceId, quantity: 1 }],
+                success_url: body.data.success_url,
+                cancel_url: body.data.cancel_url,
                 metadata: {
                     userId: user.id,
                 },
@@ -67,9 +76,9 @@ export const handleWebhook: RequestHandler = async(req,res) =>{
 
                     let planType: SubscriptionType = SubscriptionType.FREE;
 
-                    if (succeededPriceId === process.env.STRIPE_PRICE_ID_PREMIUM) {
+                    if (succeededPriceId === process.env.STRIPE_PRICE_ID_PREMIUM_MENSAL || succeededPriceId === process.env.STRIPE_PRICE_ID_PREMIUM_ANUAL ) {
                         planType = SubscriptionType.PREMIUM;
-                    } else if (succeededPriceId === process.env.STRIPE_PRICE_ID_BASIC) {
+                    } else if (succeededPriceId === process.env.STRIPE_PRICE_ID_BASIC_MENSAL || succeededPriceId === process.env.STRIPE_PRICE_ID_BASIC_ANUAL) {
                         planType = SubscriptionType.BASIC;
     }
                     if (succeededInvoice.customer) {
