@@ -21,8 +21,26 @@ export const getInfoUser: RequestHandler = async(req, res) =>{
             customer: token.stripeId,
             limit: 5,
         });
+        const subscriptions = await stripe.subscriptions.list({
+            customer:  token.stripeId,
+            status: "active", // Apenas assinaturas ativas
+            limit: 1,
+        });
+         
+        if (subscriptions.data.length === 0) {
+            res.status(404).json({ error: "Nenhuma assinatura ativa encontrada" });
+            return
+        }
+      
+        const subscription = subscriptions.data[0];
+        const price = await stripe.prices.retrieve(subscription.items.data[0].price.id);
+        const product = await stripe.products.retrieve(price.product as string);
     
-        res.json(payments.data);
+        res.json({
+            plan: product.name, // Nome do plano (ex: "Mensal" ou "Anual")
+            renewalDate: new Date(subscription.current_period_end * 1000).toISOString(), // Data de renovação
+            payments: payments.data,
+        });
         return;
     }
     res.json({error: 'Algo deu errado'});
