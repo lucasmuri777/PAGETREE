@@ -41,7 +41,7 @@ export const createChekout:RequestHandler = async(req, res) =>{
                 },
                
             });
-            res.status(200).json({ sessionId: session.url });
+            res.status(200).json({ chekout: session.url });
             return;
         }catch(err){
             console.error(err);
